@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "description": "Code from the React tutorial.",
   "main": "server.js",
-  "licence": "MIT",
+  "license": "MIT",
   "dependencies": {
     "express": "^4.4.5"
   },
