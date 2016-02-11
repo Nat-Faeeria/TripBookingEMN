@@ -1,8 +1,13 @@
 var ButtonSend = React.createClass({
+    handleClick(){
+        let rd = this.props.onUserInput();
+        let toRet = {"nom": rd.person.lastName,"prenom": rd.person.firstName,"telephone": rd.person.tel,"mail": rd.person.email,"idVol": `${rd.vol.id}`,"idHotel": `${rd.hotel.id}`};
+        $.post("http://localhost:42679/api/commande", toRet);
+    },
     render(){
         return(
             <div className="row">
-                <button type="submit" className="btn waves-effect waves-light col s6 offset-s3 m4 offset-m4">Book me up, Scotty !</button>
+                <button type="submit" className="btn waves-effect waves-light col s6 offset-s3 m4 offset-m4" onClick={this.handleClick}>Book me up, Scotty !</button>
             </div>
         );
     }
@@ -13,13 +18,34 @@ var Card = React.createClass({
         this.props.onUserInput(this.props.value);
     },
     render: function () {
-        return (
-            <div className="left-margin card cyan darken-2 hoverable col s6 m2" value={JSON.stringify(this.props.value)} onClick={this.handleClick}>
-                <p className="card-content white-text">
-                    {this.props.value.content}
-                </p>
-            </div>
-        );
+        if (this.props.value.prix === undefined) {
+            return (
+                <div className="left-margin card cyan darken-2 hoverable col s6 m2"
+                     value={JSON.stringify(this.props.value)} onClick={this.handleClick}>
+                    <p className="card-content white-text">
+                        {this.props.value.nom}
+                    </p>
+                    <p className="card-content white-text">
+                        {this.props.value.categorie}
+                    </p>
+                    <p className="card-content white-text">
+                        {this.props.value.prix}
+                    </p>
+                </div>
+            );
+        } else {
+            return (
+                <div className="left-margin card cyan darken-2 hoverable col s6 m2"
+                     value={JSON.stringify(this.props.value)} onClick={this.handleClick}>
+                    <p className="card-content white-text">
+                        Departure : {this.props.value.ville_depart} - {this.props.value.heure_depart}
+                    </p>
+                    <p className="card-content white-text">
+                        Arrival : {this.props.value.ville_arrivee} - {this.props.value.heure_arrivee}
+                    </p>
+                </div>
+            );
+        }
     }
 });
 
@@ -51,7 +77,7 @@ var CardList = React.createClass({
 
 var ButtonSearch = React.createClass({
     getInitialState(){
-        return {clicked: false, volData: [], hotelData: [], selectedVol:"", selectedHotel:"", person: "", hotelWanted: false};
+        return {clicked: false, volData: [], hotelData: [], selectedVol:"", selectedHotel:"", person: "", hotelWanted: false, villeDepart: "", villeArrivee: ""};
     },
     setSelectedVol(vol){
         this.setState({selectedVol: vol});
@@ -67,33 +93,31 @@ var ButtonSearch = React.createClass({
     },
     handleClick(){
         let data = this.props.onUserInput();
-        //this.setState({formData: data.person, hotelWanted: data.wantHotel,clicked: true});
-        //this.setState({});
-        this.setState({formData: data.person, hotelWanted: data.wantHotel,clicked: true, volData: [{id:1, content:"Vol1"},{id:2, content:"Vol2"}]});
-        /*$.ajax({
-            url: "/url/vols",
+        this.setState({formData: data.person, hotelWanted: data.wantHotel,clicked: true, villeDepart: data.villeDepart, villeArivee: data.villeArrivee});
+        $.ajax({
+            url: `http://localhost:1669/get_flights/${this.state.villeDepart}/${this.state.villeArrivee}`,
             dataType: 'json',
             cache: false,
             success: function (data) {
+                console.log(data);
                 this.setState({volData: data});
             }.bind(this),
             error: function (xhr, status, err) {
-                console.error("/url/vols", status, err.toString());
+                console.error(`http://localhost:1669/get_flights/${this.state.villeDepart}/${this.state.villeArrivee}`, status, err.toString());
             }.bind(this)
-        });*/
+        });
         if (data.wantHotel){
-            this.setState({hotelData: [{id: 1, content:"Hotel1"},{id: 2, content:"Hotel2"}]});
-            /*$.ajax({
-                url: "/url/hotels",
+            $.ajax({
+                url: `http://localhost/get_hotels/${this.state.villeArivee}`,
                 dataType: 'json',
                 cache: false,
                 success: function (data) {
                     this.setState({hotelData: data});
                 }.bind(this),
                 error: function (xhr, status, err) {
-                    console.error("/url/hotels", status, err.toString());
+                    console.error(`http://localhost/get_hotels/${this.state.villeArivee}`, status, err.toString());
                 }.bind(this)
-            });*/
+            });
         }
     },
     render(){
@@ -107,7 +131,7 @@ var ButtonSearch = React.createClass({
                         </div>
                         <CardList name="Vols" data={this.state.volData} onUserInput={this.setSelectedVol} />
                         <CardList name="Hotels" data={this.state.hotelData} onUserInput={this.setSelectedHotel} />
-                        <ButtonSend onUserInput={this.toReturn()}/>
+                        <ButtonSend onUserInput={this.toReturn}/>
                     </div>
                 );
             }else {
@@ -118,7 +142,7 @@ var ButtonSearch = React.createClass({
                                     className="btn waves-effect waves-light col s6 offset-s3 m2 offset-m5">Search</button>
                         </div>
                         <CardList name="Vols" data={this.state.volData} onUserInput={this.setSelectedVol}/>
-                        <ButtonSend onUserInput={this.toReturn()}/>
+                        <ButtonSend onUserInput={this.toReturn}/>
                     </div>
                 );
             }
@@ -138,10 +162,8 @@ var SelectCity = React.createClass({
         return {selected:""};
     },
     handleChange() {
-        if (this.props.first) {
-            this.state.selected = ReactDOM.findDOMNode(this.refs.depart).value;
-            this.props.onUserInput(this.state.selected);
-        }
+        this.state.selected = ReactDOM.findDOMNode(this.refs[this.props.val]).value;
+        this.props.onUserInput(this.state.selected);
     },
     render(){
         let options = this.props.data.map(function (value) {
@@ -158,19 +180,36 @@ var SelectCity = React.createClass({
 
 var SelectionPanel = React.createClass({
     getInitialState(){
-        return {fullData:["Bordeaux","Paris","Tokyo","NYC"], partialData:["Bordeaux","Paris","Tokyo","NYC"]};
+        return {fullData:[], partialData:[], villeDepart:"", villeArrivee: ""};
     },
-    handleChange(selected){
-        let array = this.getInitialState().partialData;
+    handleChangeDep(selected){
+        let array = this.getInitialState().fullData;
         let index = array.findIndex(function(obj){
             return (obj === selected);
         });
         array.splice(index, 1);
-        this.setState({partialData: array});
+        this.setState({partialData: array, villeDepart: selected});
+    },
+    handleChangeAr(selected){
+        this.setState({villeArrivee: selected});
+    },
+    componentDidMount(){
+        $.ajax({
+            url: "http://localhost:1669/get_cities",
+            dataType: 'json',
+            cache: false,
+            success: function (data) {
+                this.setState({fullData: data});
+            }.bind(this),
+            error: function (xhr, status, err) {
+                console.error("http://localhost:1669/get_cities", status, err.toString());
+            }.bind(this)
+        });
     },
     getFormData(){
         return {wantHotel: this.refs['wantHotel'].checked, person: {firstName: this.refs['firstName'].value,
-            lastName:this.refs['lastName'].value,tel:this.refs['tel'].value,email:this.refs['email'].value}};
+            lastName:this.refs['lastName'].value,tel:this.refs['tel'].value,email:this.refs['email'].value},
+            villeDepart: this.state.villeDepart, villeArrivee: this.state.villeArrivee};
     },
     render(){
         return (
@@ -195,9 +234,13 @@ var SelectionPanel = React.createClass({
                         </div>
                     </div>
                     <div className="row">
-                        <SelectCity first="true" val="depart" data={this.state.fullData} onUserInput={this.handleChange}/>
+                        <input type="date" className="datepicker col s12 m5"/>
+                        <input type="date" className="datepicker col s12 m5 offset-m2"/>
+                    </div>
+                    <div className="row">
+                        <SelectCity first="true" val="depart" data={this.state.fullData} onUserInput={this.handleChangeDep}/>
                         <div class="col s0 m1"></div>
-                        <SelectCity first="false" val="destination" data={this.state.partialData}/>
+                        <SelectCity first="false" val="destination" data={this.state.partialData} onUserInput={this.handleChangeAr}/>
                         <div className="input-field col s12 m1">
                             <input type="checkbox" id="wantHotel" ref="wantHotel"/>
                             <label htmlFor="wantHotel">Hotel?</label>
