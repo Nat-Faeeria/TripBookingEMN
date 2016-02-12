@@ -183,7 +183,7 @@ var SelectionPanel = React.createClass({
         return {fullData:[], partialData:[], villeDepart:"", villeArrivee: ""};
     },
     handleChangeDep(selected){
-        let array = this.getInitialState().fullData;
+        let array = Object.create(this.getInitialState().fullData);
         let index = array.findIndex(function(obj){
             return (obj === selected);
         });
