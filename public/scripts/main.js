@@ -179,7 +179,7 @@ var SelectCity = React.createClass({
 
 var SelectionPanel = React.createClass({
     getInitialState(){
-        return {fullData:["a","b"], partialData:[], villeDepart:"", villeArrivee: ""};
+        return {fullData:[], partialData:[], villeDepart:"", villeArrivee: ""};
     },
     handleChangeDep(selected){
         let array = Object.create(this.state.fullData);
@@ -193,7 +193,7 @@ var SelectionPanel = React.createClass({
         this.setState({villeArrivee: selected});
     },
     componentDidMount(){
-        /*$.ajax({
+        $.ajax({
             url: "http://localhost:1669/get_cities",
             dataType: 'json',
             cache: false,
@@ -203,7 +203,7 @@ var SelectionPanel = React.createClass({
             error: function (xhr, status, err) {
                 console.error("http://localhost:1669/get_cities", status, err.toString());
             }.bind(this)
-        });*/
+        });
     },
     getFormData(){
         return {wantHotel: this.refs['wantHotel'].checked, person: {firstName: this.refs['firstName'].value,
