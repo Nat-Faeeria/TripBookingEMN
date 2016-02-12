@@ -1,6 +1,6 @@
 {
   "name": "trip-booking-emn",
-  "version": "0.0.1",
+  "version": "1.0.0",
   "description": "Code from the React tutorial.",
   "main": "server.js",
   "license": "MIT",

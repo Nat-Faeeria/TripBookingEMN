@@ -239,7 +239,7 @@ var SelectionPanel = React.createClass({
                     </div>
                     <div className="row">
                         <SelectCity first="true" val="depart" data={this.state.fullData} onUserInput={this.handleChangeDep}/>
-                        <div class="col s0 m1"></div>
+                        <div className="col s0 m1"></div>
                         <SelectCity first="false" val="destination" data={this.state.partialData} onUserInput={this.handleChangeAr}/>
                         <div className="input-field col s12 m1">
                             <input type="checkbox" id="wantHotel" ref="wantHotel"/>
