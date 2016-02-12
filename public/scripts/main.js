@@ -74,7 +74,7 @@ var CardList = React.createClass({
 
 var ButtonSearch = React.createClass({
     getInitialState(){
-        return {clicked: false, volData: [], hotelData: [], selectedVol:"", selectedHotel:"", person: "", hotelWanted: false, villeDepart: "", villeArrivee: ""};
+        return {clicked: false, volData: [], hotelData: [], selectedVol:"", selectedHotel:"", person: "", hotelWanted: false};
     },
     setSelectedVol(vol){
         this.setState({selectedVol: vol});
@@ -90,30 +90,29 @@ var ButtonSearch = React.createClass({
     },
     handleClick(){
         let data = this.props.onUserInput();
-        this.setState({formData: data.person, hotelWanted: data.wantHotel,clicked: true,
-                villeDepart: data.villeDepart, villeArrivee: data.villeArrivee});
+        this.setState({formData: data.person, hotelWanted: data.wantHotel,clicked: true});
         $.ajax({
-            url: `http://localhost:1669/get_flights/${this.state.villeDepart}/${this.state.villeArrivee}`,
-            dataType: 'json',
-            cache: false,
-            success: function (data) {
-                console.log(data);
-                this.setState({volData: data});
-            }.bind(this),
-            error: function (xhr, status, err) {
-                console.error(`http://localhost:1669/get_flights/${this.state.villeDepart}/${this.state.villeArrivee}`, status, err.toString());
-            }.bind(this)
+        url: `http://localhost:1669/get_flights/${data.villeDepart}/${data.villeArrivee}`,
+        dataType: 'json',
+        cache: false,
+        success: function (data) {
+            console.log(data);
+            this.setState({volData: data});
+        }.bind(this),
+        error: function (xhr, status, err) {
+            console.error(`http://localhost:1669/get_flights/${data.villeDepart}/${data.villeArrivee}`, status, err.toString());
+        }.bind(this)
         });
         if (data.wantHotel) {
             $.ajax({
-                url: `http://localhost:5075/get_hotels/${this.state.villeArivee}`,
+                url: `http://localhost:5075/get_hotels/${data.villeArivee}`,
                 dataType: 'json',
                 cache: false,
                 success: function (data) {
                     this.setState({hotelData: data});
                 }.bind(this),
                 error: function (xhr, status, err) {
-                    console.error(`http://localhost/get_hotels/${this.state.villeArivee}`, status, err.toString());
+                    console.error(`http://localhost/get_hotels/${data.villeArivee}`, status, err.toString());
                 }.bind(this)
             });
 
@@ -179,7 +178,7 @@ var SelectCity = React.createClass({
 
 var SelectionPanel = React.createClass({
     getInitialState(){
-        return {fullData:[], partialData:[], villeDepart:"", villeArrivee: ""};
+        return {fullData:["a","b","c"], partialData:[], villeDepart:"", villeArrivee: ""};
     },
     handleChangeDep(selected){
         let array = Object.create(this.state.fullData);
@@ -193,7 +192,7 @@ var SelectionPanel = React.createClass({
         this.setState({villeArrivee: selected});
     },
     componentDidMount(){
-        $.ajax({
+        /*$.ajax({
             url: "http://localhost:1669/get_cities",
             dataType: 'json',
             cache: false,
@@ -203,7 +202,7 @@ var SelectionPanel = React.createClass({
             error: function (xhr, status, err) {
                 console.error("http://localhost:1669/get_cities", status, err.toString());
             }.bind(this)
-        });
+        });*/
     },
     getFormData(){
         return {wantHotel: this.refs['wantHotel'].checked, person: {firstName: this.refs['firstName'].value,
