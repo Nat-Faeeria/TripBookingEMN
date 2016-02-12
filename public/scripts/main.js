@@ -20,7 +20,7 @@ var Card = React.createClass({
         this.props.onUserInput(this.props.value);
     },
     render: function () {
-        if (this.props.value.prix === undefined) {
+        if (this.props.value.prix) {
             return (
                 <div className="left-margin card cyan darken-2 hoverable col s6 m2"
                      value={JSON.stringify(this.props.value)} onClick={this.handleClick}>
@@ -35,7 +35,6 @@ var Card = React.createClass({
         } else {
             let heureDateDepart = new Date(this.props.value.heure_depart);
             let heureDateArrivee = new Date(this.props.value.heure_arrivee);
-            console.log(heureDateDepart);
             let heuresDepart = (heureDateDepart.getHours() < 10) ? '0' + heureDateDepart.getHours().toString() : heureDateDepart.getHours().toString();
             heuresDepart--;
             let minutesDepart = (heureDateDepart.getMinutes() < 10) ? '0' + heureDateDepart.getMinutes().toString() : heureDateDepart.getMinutes().toString();
