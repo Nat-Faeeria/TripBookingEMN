@@ -2,9 +2,7 @@ var ButtonSend = React.createClass({
     handleClick(){
         let rd = this.props.onUserInput();
         let toRet = {"nom": rd.person.lastName,"prenom": rd.person.firstName,"telephone": rd.person.tel,"mail": rd.person.email,"idVol": `${rd.vol.id}`,"idHotel": `${rd.hotel.id}`};
-        $.post("http://localhost:42679/api/commande", toRet, function(success){
-            window.alert("Commande bien enregistrée");
-        });
+        $.post("http://localhost:42679/api/commande", toRet);
     },
     render(){
         return(
@@ -33,14 +31,22 @@ var Card = React.createClass({
                 </div>
             );
         } else {
+            let heureDateDepart = new Date(this.props.value.heure_depart);
+            let heureDateArrivee = new Date(this.props.value.heure_arrivee);
+            console.log(heureDateDepart);
+            let heuresDepart = (heureDateDepart.getHours() < 10) ? '0' + heureDateDepart.getHours().toString() : heureDateDepart.getHours().toString();
+            heuresDepart--;
+            let minutesDepart = (heureDateDepart.getMinutes() < 10) ? '0' + heureDateDepart.getMinutes().toString() : heureDateDepart.getMinutes().toString();
+            let heuresArrivee = (heureDateArrivee.getHours() < 10) ? '0' + heureDateArrivee.getHours().toString() : heureDateArrivee.getHours().toString();
+            heuresArrivee--;
+            let minutesArrivee = (heureDateArrivee.getMinutes() < 10) ? '0' + heureDateArrivee.getMinutes().toString() : heureDateArrivee.getMinutes().toString();
             return (
                 <div className="left-margin card cyan darken-2 hoverable col s6 m2"
                      value={JSON.stringify(this.props.value)} onClick={this.handleClick}>
                     <p className="card-content white-text">
-                        Departure : {this.props.value.ville_depart} - {this.props.value.heure_depart}
-                    </p>
-                    <p className="card-content white-text">
-                        Arrival : {this.props.value.ville_arrivee} - {this.props.value.heure_arrivee}
+                        Departure : {this.props.value.ville_depart} - {heuresDepart}:{minutesDepart}
+                        <br/>
+                        Arrival : {this.props.value.ville_arrive} - {heuresArrivee}:{minutesArrivee}
                     </p>
                 </div>
             );
@@ -92,7 +98,7 @@ var ButtonSearch = React.createClass({
     },
     handleClick(){
         let data = this.props.onUserInput();
-        this.setState({formData: data.person, hotelWanted: data.wantHotel,clicked: true});
+        this.setState({person: data.person, hotelWanted: data.wantHotel,clicked: true});
         $.ajax({
         url: `http://localhost:1669/get_flights/${data.villeDepart}/${data.villeArrivee}`,
         dataType: 'json',
@@ -117,7 +123,6 @@ var ButtonSearch = React.createClass({
                     console.error(`http://localhost/get_hotels/${data.villeArrivee}`, status, err.toString());
                 }.bind(this)
             });
-
         }
     },
     render(){
