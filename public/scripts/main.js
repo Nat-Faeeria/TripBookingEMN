@@ -1,14 +1,15 @@
 var ButtonSend = React.createClass({
     handleClick(){
         let rd = this.props.onUserInput();
-        let toRet = {"nom": rd.person.lastName,"prenom": rd.person.firstName,"telephone": rd.person.tel,
-            "mail": rd.person.email,"idVol": `${rd.vol.id}`,"idHotel": `${rd.hotel.id}`,"dateDebut": rd.dates.dateDeb, "dateFin": rd.dates.dateFin};
-        $.post("http://localhost:42679/api/commande", toRet);
+        let toRet = {"nom": rd.person.lastName,"prenom": rd.person.firstName,"telephone": rd.person.tel, "mail": rd.person.email,"idVol": `${rd.vol.id}`,"idHotel": `${rd.hotel.id}`};
+        $.post("http://localhost:42679/api/commande", toRet, function(success){
+            window.alert("Commande bien enregistrée !");
+        });
     },
     render(){
         return(
             <div className="row">
-                <button type="submit" className="btn waves-effect waves-light col s6 offset-s3 m4 offset-m4" onClick={this.handleClick}>Book me up, Scotty !</button>
+                <button type="submit" className="btn waves-effect waves-light col s6 offset-s3 m4 offset-m4" onClick={this.handleClick}>Book !</button>
             </div>
         );
     }
@@ -83,7 +84,7 @@ var CardList = React.createClass({
 
 var ButtonSearch = React.createClass({
     getInitialState(){
-        return {clicked: false, volData: [], hotelData: [], selectedVol:"", selectedHotel:"", person: "", hotelWanted: false, dates:""};
+        return {clicked: false, volData: [], hotelData: [], selectedVol:"", selectedHotel:"", person: "", hotelWanted: false};
     },
     setSelectedVol(vol){
         this.setState({selectedVol: vol});
@@ -95,11 +96,11 @@ var ButtonSearch = React.createClass({
         return this.state.hotelWanted;
     },
     toReturn(){
-        return {person: this.state.person, dates: this.state.dates, vol: this.state.selectedVol, hotel: this.state.selectedHotel};
+        return {person: this.state.person, vol: this.state.selectedVol, hotel: this.state.selectedHotel};
     },
     handleClick(){
         let data = this.props.onUserInput();
-        this.setState({person: data.person, dates: data.dates, hotelWanted: data.wantHotel,clicked: true});
+        this.setState({person: data.person, hotelWanted: data.wantHotel,clicked: true});
         $.ajax({
         url: `http://localhost:1669/get_flights/${data.villeDepart}/${data.villeArrivee}`,
         dataType: 'json',
@@ -215,8 +216,7 @@ var SelectionPanel = React.createClass({
     getFormData(){
         return {wantHotel: this.refs['wantHotel'].checked, person: {firstName: this.refs['firstName'].value,
             lastName:this.refs['lastName'].value,tel:this.refs['tel'].value,email:this.refs['email'].value},
-            villeDepart: this.state.villeDepart, villeArrivee: this.state.villeArrivee,
-            dates: { dateDeb: this.refs['dateDeb'].value, dateFin: this.refs['dateFin'].value}};
+            villeDepart: this.state.villeDepart, villeArrivee: this.state.villeArrivee};
     },
     render(){
         return (
