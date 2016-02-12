@@ -2,7 +2,9 @@ var ButtonSend = React.createClass({
     handleClick(){
         let rd = this.props.onUserInput();
         let toRet = {"nom": rd.person.lastName,"prenom": rd.person.firstName,"telephone": rd.person.tel,"mail": rd.person.email,"idVol": `${rd.vol.id}`,"idHotel": `${rd.hotel.id}`};
-        $.post("http://localhost:42679/api/commande", toRet);
+        $.post("http://localhost:42679/api/commande", toRet, function(success){
+            window.alert("Commande bien enregistrée");
+        });
     },
     render(){
         return(
