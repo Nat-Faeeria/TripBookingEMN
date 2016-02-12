@@ -26,9 +26,6 @@ var Card = React.createClass({
                         {this.props.value.nom}
                     </p>
                     <p className="card-content white-text">
-                        {this.props.value.categorie}
-                    </p>
-                    <p className="card-content white-text">
                         {this.props.value.prix}
                     </p>
                 </div>
@@ -93,32 +90,35 @@ var ButtonSearch = React.createClass({
     },
     handleClick(){
         let data = this.props.onUserInput();
-        this.setState({formData: data.person, hotelWanted: data.wantHotel,clicked: true, villeDepart: data.villeDepart, villeArivee: data.villeArrivee});
-        $.ajax({
-            url: `http://localhost:1669/get_flights/${this.state.villeDepart}/${this.state.villeArrivee}`,
-            dataType: 'json',
-            cache: false,
-            success: function (data) {
-                console.log(data);
-                this.setState({volData: data});
-            }.bind(this),
-            error: function (xhr, status, err) {
-                console.error(`http://localhost:1669/get_flights/${this.state.villeDepart}/${this.state.villeArrivee}`, status, err.toString());
-            }.bind(this)
-        });
-        if (data.wantHotel){
+        this.setState({formData: data.person, hotelWanted: data.wantHotel,clicked: true,
+            villeDepart: data.villeDepart, villeArivee: data.villeArrivee}).then(function(e) {
             $.ajax({
-                url: `http://localhost/get_hotels/${this.state.villeArivee}`,
+                url: `http://localhost:1669/get_flights/${this.state.villeDepart}/${this.state.villeArrivee}`,
                 dataType: 'json',
                 cache: false,
                 success: function (data) {
-                    this.setState({hotelData: data});
+                    console.log(data);
+                    this.setState({volData: data});
                 }.bind(this),
                 error: function (xhr, status, err) {
-                    console.error(`http://localhost/get_hotels/${this.state.villeArivee}`, status, err.toString());
+                    console.error(`http://localhost:1669/get_flights/${this.state.villeDepart}/${this.state.villeArrivee}`, status, err.toString());
                 }.bind(this)
             });
-        }
+            if (data.wantHotel) {
+                $.ajax({
+                    url: `http://localhost:5075/get_hotels/${this.state.villeArivee}`,
+                    dataType: 'json',
+                    cache: false,
+                    success: function (data) {
+                        this.setState({hotelData: data});
+                    }.bind(this),
+                    error: function (xhr, status, err) {
+                        console.error(`http://localhost/get_hotels/${this.state.villeArivee}`, status, err.toString());
+                    }.bind(this)
+                });
+
+            }
+        });
     },
     render(){
         if (this.state.clicked) {
